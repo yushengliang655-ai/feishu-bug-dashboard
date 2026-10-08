@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>飞书项目 · Bug 状态看板</title>
+  <style>
+    :root {
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      color: #1f2937;
+      background: #f4f5f8;
+      font-synthesis: none;
+      --blue: #477bea;
+      --green: #58b878;
+      --red: #df625c;
+      --amber: #e6a83e;
+      --muted: #87909f;
+      --line: #eceef2;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, input, select { font: inherit; }
+    .page { max-width: 1440px; margin: 0 auto; padding: 26px 28px 52px; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
+    h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+    .metadata { margin-top: 7px; color: var(--muted); font-size: 12px; }
+    .metadata a { color: inherit; text-decoration: none; }
+    .metadata a:hover { color: var(--blue); }
+    .button { border: 1px solid #e4e7ed; border-radius: 9px; padding: 9px 13px; background: #fff; color: #374151; cursor: pointer; font-size: 13px; }
+    .button:hover { border-color: #b7c8f5; color: var(--blue); }
+    .panel { border: 1px solid #eceef2; border-radius: 14px; background: #fff; box-shadow: 0 2px 8px #11182708; }
+    .filters { display: flex; align-items: center; flex-wrap: wrap; gap: 11px 14px; padding: 12px 14px; margin-bottom: 14px; }
+    .filter-label { color: #778093; font-size: 12px; }
+    select, input { min-width: 130px; height: 34px; border: 1px solid #eaecf0; border-radius: 7px; padding: 0 9px; background: #fff; color: #3f4755; font-size: 12px; }
+    input { min-width: 180px; }
+    .search { flex: 1; min-width: 190px; }
+    .status-pills { display: flex; flex-wrap: wrap; gap: 7px; margin-left: auto; }
+    .pill { border: 1px solid transparent; border-radius: 999px; padding: 6px 11px; cursor: pointer; font-size: 11px; }
+    .pill[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor; }
+    .pill-all { background: #eef1f6; color: #586274; }
+    .pill-open { background: #eaf0ff; color: #3567db; }
+    .pill-resolved { background: #e8f7ed; color: #34945a; }
+    .pill-reopen { background: #fdeceb; color: #ce524d; }
+    .pill-verify { background: #fff4df; color: #bb811a; }
+    .pill-unknown { background: #f1f2f5; color: #727b8a; }
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 14px; }
+    .stat { position: relative; min-height: 84px; padding: 14px 17px 13px 20px; overflow: hidden; }
+    .stat::before { position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--stat-color, var(--blue)); content: ""; }
+    .stat-value { color: var(--stat-color, var(--blue)); font-size: 27px; font-weight: 700; line-height: 1.15; }
+    .stat-label { margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .section { padding: 18px 18px 15px; margin-bottom: 14px; }
+    .section-title { margin: 0 0 16px; font-size: 14px; font-weight: 650; }
+    .chart-frame { position: relative; height: 224px; padding: 0 8px 24px 35px; }
+    .chart-grid { position: absolute; inset: 6px 5px 28px 35px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+    .grid-line { border-top: 1px solid #f0f1f4; }
+    .chart-y-labels { position: absolute; inset: 0 auto 25px 0; display: flex; flex-direction: column; justify-content: space-between; width: 27px; color: #9aa1ad; font-size: 10px; text-align: right; }
+    .chart-bars { position: relative; z-index: 1; display: flex; align-items: stretch; justify-content: space-around; height: 100%; }
+    .week { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 28px; }
+    .bar-space { display: flex; flex: 1; align-items: flex-end; width: 100%; justify-content: center; }
+    .bar { position: relative; width: min(34px, 52%); min-height: 0; border-radius: 5px 5px 2px 2px; background: var(--blue); }
+    .bar.zero { height: 2px !important; background: #e8ebf0; }
+    .bar-value { position: absolute; top: -18px; left: 50%; color: #5275c5; font-size: 10px; transform: translateX(-50%); }
+    .week-label { position: absolute; bottom: 0; color: #858d9a; font-size: 10px; white-space: nowrap; }
+    .chart-legend { display: flex; align-items: center; gap: 7px; margin-top: 3px; color: #7b8390; font-size: 11px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; background: var(--blue); }
+    .distribution-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+    .distribution { padding: 18px; }
+    .distribution-row { display: grid; grid-template-columns: minmax(70px, 130px) 1fr 26px; align-items: center; gap: 10px; margin: 12px 0; color: #5c6574; font-size: 12px; }
+    .distribution-choice { display: contents; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+    .distribution-choice:hover > span:first-child { color: var(--blue); text-decoration: underline; }
+    .distribution-choice:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+    .track { height: 9px; overflow: hidden; border-radius: 999px; background: #f0f2f5; }
+    .fill { height: 100%; min-width: 0; border-radius: inherit; background: var(--blue); }
+    .distribution-row .number { color: #7b8390; text-align: right; }
+    .details { padding: 18px; }
+    .details-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .details-heading .section-title { margin: 0; }
+    .result-count { color: var(--muted); font-size: 12px; }
+    .group { margin-top: 12px; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; }
+    .group-title { display: flex; justify-content: space-between; gap: 12px; padding: 11px 13px; background: #fafbfc; color: #3f4858; font-size: 12px; font-weight: 650; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 10px 13px; border-top: 1px solid #f0f1f4; font-size: 12px; white-space: nowrap; }
+    th { color: #8a92a0; font-size: 11px; font-weight: 500; }
+    td.title-cell { min-width: 220px; max-width: 520px; white-space: normal; }
+    .bug-link { color: #3166df; font-weight: 600; text-decoration: none; }
+    .bug-link:hover { text-decoration: underline; }
+    .field-link { color: inherit; text-decoration: none; }
+    .field-link:hover { color: #3166df; text-decoration: underline; }
+    a.tag { cursor: pointer; }
+    .issue-id { display: block; margin-top: 3px; color: #9aa1ad; font-size: 10px; }
+    .tag { display: inline-block; border-radius: 999px; padding: 4px 8px; background: #f1f2f5; color: #6d7685; font-size: 10px; text-decoration: none; }
+    .tag-p0 { background: #fdeceb; color: #c74b45; }
+    .tag-p1 { background: #fff0e3; color: #b76b16; }
+    .tag-p2 { background: #fff6df; color: #98721b; }
+    .tag-p4 { background: #edf1f8; color: #64728b; }
+    .tag-open { background: #eaf0ff; color: #3567db; }
+    .tag-resolved { background: #e8f7ed; color: #34945a; }
+    .tag-reopen { background: #fdeceb; color: #ce524d; }
+    .tag-verify { background: #fff4df; color: #bb811a; }
+    .tag-unknown { background: #f1f2f5; color: #727b8a; }
+    .notice {
+      margin: 0 0 14px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .notice-info { background: #eef4ff; border-color: #d9e7ff; color: #3459a3; }
+    .notice-success { background: #eafaf0; border-color: #d4f0dd; color: #247449; }
+    .notice-error { background: #fff1f0; border-color: #f7d4d0; color: #a43d36; }
+    .empty { padding: 28px; color: #87909f; text-align: center; font-size: 13px; }
+    .footnote { margin-top: 12px; color: #9299a6; font-size: 11px; line-height: 1.7; }
+    @media (max-width: 820px) {
+      .page { padding: 18px 12px 36px; }
+      .filters { align-items: stretch; }
+      .status-pills { width: 100%; margin-left: 0; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .distribution-grid { grid-template-columns: 1fr; gap: 0; }
+      .distribution-grid .panel + .panel { margin-top: 12px; }
+      .chart-frame { height: 190px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topline">
+      <div>
+        <h1>飞书项目 · Bug 状态看板</h1>
+        <div class="metadata">
+          空间 i9lz5k · issue · 共 17 条 · 数据快照 2026/10/08 ·
+          <a href="https://project.feishu.cn/i9lz5k/issue/homepage?lang=zh-CN" target="_blank" rel="noopener noreferrer">打开飞书原列表 ↗</a>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button class="button" id="resetFilters" type="button">重置筛选</button>
+      </div>
+    </header>
+
+    <div class="notice notice-info" role="status">公开只读快照：数据截至 2026/10/08；此页面不会自动同步飞书。</div>
+
+    <section class="filters panel" aria-label="筛选条件">
+      <span class="filter-label">统计范围</span>
+      <select id="rangeFilter" aria-label="统计范围">
+        <option value="all">全部时间</option>
+        <option value="28">近 4 周</option>
+      </select>
+      <span class="filter-label">优先级</span>
+      <select id="priorityFilter" aria-label="按优先级筛选"><option value="">全部</option></select>
+      <span class="filter-label">项目</span>
+      <select id="projectFilter" aria-label="按项目筛选"><option value="">全部</option></select>
+      <span class="filter-label">状态</span>
+      <select id="statusFilter" aria-label="按状态筛选"><option value="">全部</option></select>
+      <input class="search" id="search" type="search" placeholder="标题 / ID 搜索" aria-label="标题或编号搜索">
+      <div class="status-pills" id="statusPills" aria-label="状态快捷筛选"></div>
+    </section>
+
+    <section class="stats" aria-label="统计摘要">
+      <article class="stat panel" style="--stat-color:var(--blue)"><div class="stat-value" id="totalCount">0</div><div class="stat-label">当前范围 Bug</div></article>
+      <article class="stat panel" style="--stat-color:var(--green)"><div class="stat-value" id="resolvedCount">0</div><div class="stat-label">已解决</div></article>
+      <article class="stat panel" style="--stat-color:var(--amber)"><div class="stat-value" id="attentionCount">0</div><div class="stat-label">有状态但未解决</div></article>
+      <article class="stat panel" style="--stat-color:#313b4d"><div class="stat-value" id="p0p1Count">0</div><div class="stat-label">P0 / P1 优先级</div></article>
+    </section>
+
+    <section class="section panel">
+      <h2 class="section-title">问题时间趋势 · 按周</h2>
+      <div class="chart-frame" id="trendChart" role="img" aria-label="按周统计的 Bug 问题时间"></div>
+      <div class="chart-legend"><span class="legend-dot"></span><span>问题时间</span></div>
+    </section>
+
+    <div class="distribution-grid">
+      <section class="distribution panel">
+        <h2 class="section-title">状态分布 <span class="filter-label" id="statusTotal"></span></h2>
+        <div id="statusChart"></div>
+      </section>
+      <section class="distribution panel">
+        <h2 class="section-title">优先级分布 <span class="filter-label" id="priorityTotal"></span></h2>
+        <div id="priorityChart"></div>
+      </section>
+    </div>
+    <section class="distribution panel" style="margin-bottom:14px">
+      <h2 class="section-title">项目分布 <span class="filter-label" id="projectTotal"></span></h2>
+      <div id="projectChart"></div>
+    </section>
+
+    <section class="details panel">
+      <div class="details-heading">
+        <h2 class="section-title">Bug 明细</h2>
+        <span class="result-count" id="resultCount" aria-live="polite"></span>
+        <label class="filter-label">分组
+          <select id="groupBy" aria-label="明细分组方式">
+            <option value="priority">按优先级</option>
+            <option value="project">按项目</option>
+            <option value="status">按状态</option>
+          </select>
+        </label>
+      </div>
+      <div id="groups"></div>
+      <div class="footnote">列表未展示的字段以“未设置”标注；标题使用飞书列表当前可见文本。点击 Bug 标题可在新标签页查看飞书中的完整记录。</div>
+    </section>
+  </main>
+
+  <script>
+    const bugs = [
+      { id: "7130800674", title: "xxx", status: "已打开", priority: "P4-无效任务（已知/无效）", project: "其它", date: "2026-10-08" },
+      { id: "7128705016", title: "采集过程中can/cam等异常。", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "数采背包", date: "2026-09-30" },
+      { id: "7128476637", title: "手套角度编码器有问题（特别是大拇指）", status: "已打开", priority: "P0 - 最高优先级 (致命/紧急)", project: "手&手套", date: "2026-09-29" },
+      { id: "7128153637", title: "keepLiNK KP-9000-6XHML-X 端口入口限速，≤400M 时精确，>400M 时 Enforcement 值饱和于 ~430M", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "未设置" },
+      { id: "7126744153", title: "RK_2002E 在 `reboot -f`（硬重启）后偶发不回启（ 2026年9月24日 19:39左右 ）：板子掉电/卡死后不再开机，导致远程链路彻底中断", status: "已打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "2026-09-28" },
+      { id: "7125660990", title: "RK_2002E 的adb出现连不上情况", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-24" },
+      { id: "7125518083", title: "UMI手套角度编码器读取以及可视化", status: "已解决", priority: "P2 - 中优先级 (一般)", project: "手&手套、数采背包", date: "未设置" },
+      { id: "7124887944", title: "？？", status: "bug验证", priority: "P0 - 最高优先级 (致命/紧急)", project: "其它", date: "2026-09-23" },
+      { id: "7122045167", title: "RK3588 xhci 主机控制器假死（HC died）→ USB 整树静默掉线（CANFD-hub 与 U 盘同时消失、控制器不响应枚举），纯物理重插无法恢复 的总线级故障；板子断电重启之后，错误现象消失", status: "重新打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "2026-09-21" },
+      { id: "7117641346", title: "RK3588 网口链路持续抖动会把 8MB 连续内存（CMA）池拖到干涸，触发内核 CMA 连续内存分配失败；建议增大 CMA 容量", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-17" },
+      { id: "7116689092", title: "[USB]USB 存储设备热拔插后设备命名漂移 + 僵尸只读挂载残留(偶发)", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-16" },
+      { id: "7116044530", title: "[NPU]NPU 推理进程正常退出后重新拉起时偶发 SIGSEGV（rc=139），三核模式约 8% 复现率（动态重启竞态）", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-15" },
+      { id: "7116020731", title: "[NPU]NPU 输入张量超尺寸 或者 输入张量数据类型（dtype）错误，被驱动静默接受（无报错）", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-14" },
+      { id: "7116017271", title: "[NPU]NPU 进程被 SIGKILL 异常退出后，新建/沿用进程随机段错误（竞态）", status: "已打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "未设置" },
+      { id: "7115265662", title: "[OTA]通过 eth1 网线连接 adb后，用 Poke OTA Host，无法成功连接", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-15" },
+      { id: "7114344757", title: "boot 0（19:53:29 起）起来后，NetworkManager 对 eth1 的 DHCP 一直拿不到 offer（19:55:04 起反复 ip-config -> failed），板子从此无 IP。另外 19:54:51 有一次 8852be WiFi 驱动内核 oops", status: "已打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "2026-09-14" },
+      { id: "7112870433", title: "PREEMPT_RT实时调度测试中，多锁嵌套 / 信号量同步延迟（锁争用补充），tc12_lock.sh，运行时，出现一次系统卡死崩溃。", status: "已打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "2026-09-11" }
+    ];
+
+    const demoBugs = bugs.slice();
+    let lastSuccessfulBugs = bugs.slice();
+    let lastRefreshError = "";
+    let lastRefreshAt = null;
+
+    const priorityOrder = ["P0", "P1", "P2", "P3", "P4", "未设置"];
+    const statusStyle = { "已打开": "pill-open", "已解决": "pill-resolved", "重新打开": "pill-reopen", "bug验证": "pill-verify", "未设置": "pill-unknown" };
+    const projectColors = ["var(--blue)", "var(--green)", "#e6a83e", "#8b5cf6"];
+    const fieldLabels = { priority: "优先级", project: "项目", status: "状态" };
+    const groupsElement = document.getElementById("groups");
+    const PROJECT_URL = "https://project.feishu.cn/i9lz5k/issue/homepage?lang=zh-CN";
+    const FEISHU_DETAIL_PATH = /\/issue\/detail\/([^/?#]+)/;
+
+    function setRefreshStatus(kind, message) {
+      const status = document.getElementById("refreshStatus");
+      if (!status) return;
+      status.className = `notice notice-${kind}`;
+      status.textContent = message;
+    }
+
+    function normalizeStatus(raw) {
+      const normalized = String(raw || "").trim();
+      if (!normalized) return "未设置";
+      const map = {
+        "open": "已打开",
+        "opened": "已打开",
+        "已打开": "已打开",
+        "open_bug": "已打开",
+        "closed": "已解决",
+        "已解决": "已解决",
+        "reopened": "重新打开",
+        "重新打开": "重新打开",
+        "待验证": "bug验证",
+        "bug验证": "bug验证",
+        "verify": "bug验证",
+        "验证中": "bug验证",
+        "in progress": "已打开",
+        "处理中": "已打开"
+      };
+      return map[normalized.toLowerCase()] || map[normalized] || normalized;
+    }
+
+    function normalizePriority(raw) {
+      const text = String(raw || "").trim();
+      if (!text) return "未设置";
+      if (/P0/i.test(text)) return "P0";
+      if (/P1/i.test(text)) return "P1";
+      if (/P2/i.test(text)) return "P2";
+      if (/P3/i.test(text)) return "P3";
+      if (/P4/i.test(text)) return "P4";
+      return text.includes("无效") ? "P4" : "未设置";
+    }
+
+    function normalizeProject(raw) {
+      const value = String(raw || "").trim();
+      return value || "其它";
+    }
+
+    function normalizeDate(raw) {
+      const value = String(raw || "").trim();
+      if (!value) return "未设置";
+      const iso = value.match(/\d{4}-\d{2}-\d{2}/);
+      if (iso) return iso[0];
+      const slash = value.match(/\d{4}\/\d{1,2}\/\d{1,2}/);
+      if (slash) return slash[0].replace(/\//g, "-");
+      return "未设置";
+    }
+
+    function normalizeBug(raw) {
+      const record = raw || {};
+      const id = String(record.id || record.bugId || record.issueId || "").trim();
+      const title = String(record.title || record.name || "").trim();
+      const status = normalizeStatus(record.status || record.state || record.statusText || "");
+      const priority = normalizePriority(record.priority || record.level || record.priorityText || "");
+      const project = normalizeProject(record.project || record.module || record.group || "");
+      const date = normalizeDate(record.date || record.createdAt || record.occurredAt || "");
+      return {
+        id: id || "未设置",
+        title: title || "未命名问题",
+        status,
+        priority,
+        project,
+        date
+      };
+    }
+
+    function readFeishuProjectSnapshot(doc) {
+      if (!doc || !doc.body) {
+        throw new Error("飞书项目页尚未完全加载完成。");
+      }
+      const loginIndicators = [
+        "登录",
+        "Log in",
+        "Sign in",
+        "请先登录",
+        "账号登录",
+        "验证码"
+      ];
+      const bodyText = (doc.body.innerText || "").replace(/\s+/g, "");
+      if (loginIndicators.some(token => bodyText.includes(token))) {
+        throw new Error("当前未登录飞书，或飞书会话已过期。请先登录后再刷新。");
+      }
+
+      const candidates = new Map();
+      const selectors = [
+        'a[href*="/issue/detail/"]',
+        '[data-issue-id]',
+        '[data-bug-id]',
+        '.issue-item',
+        '.issue-card',
+        '.list-item',
+        '.issue-list-item',
+        'tr[data-id]',
+        'li[data-id]'
+      ];
+
+      selectors.forEach(selector => {
+        doc.querySelectorAll(selector).forEach(element => {
+          const idMatch = (element.href || element.getAttribute("href") || "").match(FEISHU_DETAIL_PATH);
+          const fallbackId = element.dataset.issueId || element.dataset.bugId || element.dataset.id || "";
+          const id = String(idMatch ? idMatch[1] : fallbackId || "").trim();
+          const titleElement = element.querySelector("[title]") || element.querySelector(".issue-title") || element.querySelector(".title") || element;
+          const title = String(titleElement?.title || titleElement?.textContent || "").replace(/\s+/g, " ").trim();
+          if (!id && !title) return;
+          if (!id && !title.includes("Bug")) {
+            return;
+          }
+          const canonical = id || `${title}-${Math.random()}`;
+          if (!candidates.has(canonical)) {
+            candidates.set(canonical, {
+              id,
+              title,
+              status: element.dataset.status || element.getAttribute("data-status") || "",
+              priority: element.dataset.priority || element.getAttribute("data-priority") || "",
+              project: element.dataset.project || element.getAttribute("data-project") || "",
+              date: element.dataset.date || element.getAttribute("data-date") || ""
+            });
+          }
+        });
+      });
+
+      const bugsFromPage = [...candidates.values()].map(item => {
+        const title = String(item.title || "").replace(/\s+/g, " ").trim();
+        const id = String(item.id || "").trim();
+        const statusText = String(item.status || doc.body.innerText || "");
+        const priorityText = String(item.priority || doc.body.innerText || "");
+        const projectText = String(item.project || "");
+        const dateText = String(item.date || "");
+        return normalizeBug({
+          id,
+          title,
+          status: statusText || "",
+          priority: priorityText || "",
+          project: projectText || "",
+          date: dateText || ""
+        });
+      }).filter(item => item.id && item.title);
+
+      if (!bugsFromPage.length) {
+        throw new Error("未在飞书项目页中找到可解析的 Bug 列表项。");
+      }
+
+      return bugsFromPage;
+    }
+
+    function readIssueDetailSnapshot(issueId) {
+      const detailUrl = `https://project.feishu.cn/i9lz5k/issue/detail/${encodeURIComponent(issueId)}`;
+      const detailWindow = window.open(detailUrl, "_blank", "noopener,noreferrer,width=1,height=1,top=9999,left=9999");
+      if (!detailWindow) {
+        throw new Error(`无法打开 Bug ${issueId} 的详情页。`);
+      }
+      const waitForReady = () => new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error(`Bug ${issueId} 的详情页未在规定时间内加载完成。`)), 15000);
+        const tick = () => {
+          try {
+            if (!detailWindow || detailWindow.closed) {
+              clearTimeout(timeout);
+              reject(new Error(`Bug ${issueId} 的详情页已关闭。`));
+              return;
+            }
+            if (detailWindow.document && detailWindow.document.readyState === "complete") {
+              clearTimeout(timeout);
+              resolve(detailWindow.document);
+              return;
+            }
+          } catch (error) {
+            clearTimeout(timeout);
+            reject(new Error(`Bug ${issueId} 的详情页不可访问，可能需要重新登录。`));
+            return;
+          }
+          setTimeout(tick, 500);
+        };
+        tick();
+      });
+
+      return waitForReady().then(doc => {
+        if (!doc || !doc.body) {
+          throw new Error(`Bug ${issueId} 的详情页没有可读内容。`);
+        }
+        const text = (doc.body.innerText || "").replace(/\s+/g, " ").trim();
+        if (!text || /登录|Log in|Sign in|请先登录/.test(text)) {
+          throw new Error(`Bug ${issueId} 详情页需要登录，或当前会话已过期。`);
+        }
+        return {
+          title: text.slice(0, 120) || `Bug ${issueId}`,
+          status: normalizeStatus(text.match(/已解决|已打开|重新打开|待验证|bug验证|处理中|验证中/i)?.[0] || ""),
+          priority: normalizePriority(text.match(/P0|P1|P2|P3|P4/i)?.[0] || ""),
+          project: normalizeProject(text.match(/项目[:：].+?(?:\n|\s|$)/)?.[0].replace(/项目[:：]/, "") || "其它"),
+          date: normalizeDate(text.match(/\d{4}[/-]\d{1,2}[/-]\d{1,2}/)?.[0] || "")
+        };
+      });
+    }
+
+    async function refreshFromFeishu() {
+      setRefreshStatus("info", "正在后台打开飞书项目页并读取最新 Bug 列表与详情…");
+      try {
+        if (!window.chrome?.runtime?.id && !window.browser?.runtime?.id) {
+          throw new Error("当前页面没有浏览器扩展上下文，无法直接访问已登录的飞书项目页 DOM。必须在可安装浏览器扩展中运行此脚本。");
+        }
+
+        const projectWindow = window.open(PROJECT_URL, "_blank", "noopener,noreferrer,width=1,height=1,top=9999,left=9999");
+        if (!projectWindow) {
+          throw new Error("浏览器拦截了后台弹窗，无法打开飞书项目页。");
+        }
+
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error("飞书项目页未能在规定时间内加载完成。")), 25000);
+          const tick = () => {
+            try {
+              if (!projectWindow || projectWindow.closed) {
+                clearTimeout(timeout);
+                reject(new Error("后台飞书页面已被关闭。"));
+                return;
+              }
+              const doc = projectWindow.document;
+              if (doc && doc.readyState === "complete") {
+                clearTimeout(timeout);
+                resolve();
+                return;
+              }
+            } catch (error) {
+              // 如果页面属于跨站限制，后续仍然会在收集时明确报错，而不是吞掉失败。
+            }
+            setTimeout(tick, 500);
+          };
+          tick();
+        });
+
+        const doc = projectWindow.document;
+        const parsed = readFeishuProjectSnapshot(doc);
+        if (!parsed.length) {
+          throw new Error("读取到的 Bug 列表为空，无法更新看板。");
+        }
+
+        const enriched = [];
+        for (const issue of parsed) {
+          const details = await readIssueDetailSnapshot(issue.id);
+          enriched.push({
+            ...issue,
+            ...details,
+            id: String(issue.id || "").trim(),
+            title: String(issue.title || details.title || "未命名问题").trim() || "未命名问题"
+          });
+        }
+
+        const incomplete = enriched.filter(item => !item.id || !item.title || !item.status || !item.priority || !item.project);
+        if (incomplete.length) {
+          throw new Error(`飞书返回的 Bug 数据不完整，至少有 ${incomplete.length} 条缺少关键字段（如 ID / 标题 / 状态 / 优先级 / 项目）。`);
+        }
+
+        bugs.splice(0, bugs.length, ...enriched);
+        lastSuccessfulBugs = enriched.map(item => ({ ...item }));
+        lastRefreshAt = new Date();
+        lastRefreshError = "";
+        setRefreshStatus("success", `已成功刷新飞书项目数据：${enriched.length} 条 Bug，更新时间 ${lastRefreshAt.toLocaleString()}。`);
+        render();
+        return enriched;
+      } catch (error) {
+        const reason = error && error.message ? error.message : "未知读取失败";
+        lastRefreshError = reason;
+        setRefreshStatus("error", `本次刷新失败：${reason}。未覆盖当前表格，保留上次成功快照。`);
+        if (lastSuccessfulBugs.length) {
+          bugs.splice(0, bugs.length, ...lastSuccessfulBugs.map(item => ({ ...item })));
+        }
+        render();
+        return null;
+      }
+    }
+
+    function priorityCode(priority) {
+      return priority.slice(0, 2);
+    }
+
+    function sortedValues(field, items = bugs) {
+      const values = [...new Set(items.map(bug => bug[field]))];
+      if (field === "priority") return values.sort((a, b) => priorityOrder.indexOf(priorityCode(a)) - priorityOrder.indexOf(priorityCode(b)));
+      const preferred = field === "status" ? ["已打开", "处理中", "待验证", "bug验证", "重新打开", "已解决", "已关闭", "未设置"] : [];
+      return values.sort((a, b) => {
+        const ai = preferred.indexOf(a);
+        const bi = preferred.indexOf(b);
+        if (ai >= 0 || bi >= 0) return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+        return a === "未设置" ? 1 : b === "未设置" ? -1 : a.localeCompare(b, "zh-CN");
+      });
+    }
+
+    function fillFilter(id, field) {
+      const select = document.getElementById(id);
+      sortedValues(field).forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.append(option);
+      });
+    }
+
+    function currentItems() {
+      const priority = document.getElementById("priorityFilter").value;
+      const project = document.getElementById("projectFilter").value;
+      const status = document.getElementById("statusFilter").value;
+      const search = document.getElementById("search").value.trim().toLocaleLowerCase();
+      const days = document.getElementById("rangeFilter").value;
+      const latestDate = bugs.map(bug => bug.date).filter(date => date !== "未设置").sort().at(-1);
+      const cutoff = days === "all" ? "" : new Date(`${latestDate}T00:00:00Z`).getTime() - Number(days) * 86400000;
+      return bugs.filter(bug => {
+        const dateTime = bug.date === "未设置" ? NaN : new Date(`${bug.date}T00:00:00Z`).getTime();
+        return (!priority || bug.priority === priority) &&
+          (!project || bug.project === project) &&
+          (!status || bug.status === status) &&
+          (!search || `${bug.title} ${bug.id}`.toLocaleLowerCase().includes(search)) &&
+          (!cutoff || Number.isNaN(dateTime) || dateTime >= cutoff);
+      });
+    }
+
+    function renderDistribution(targetId, items, field, label) {
+      const target = document.getElementById(targetId);
+      target.replaceChildren();
+      const counts = new Map();
+      items.forEach(bug => counts.set(bug[field], (counts.get(bug[field]) || 0) + 1));
+      const entries = sortedValues(field, items).map(value => [value, counts.get(value)]);
+      const max = Math.max(1, ...entries.map(([, count]) => count));
+      entries.forEach(([value, count], index) => {
+        const row = document.createElement("div");
+        row.className = "distribution-row";
+        const choice = document.createElement("button");
+        choice.type = "button";
+        choice.className = "distribution-choice";
+        choice.title = `筛选 ${fieldLabels[field]}：${value}`;
+        const name = document.createElement("span");
+        name.textContent = value;
+        const track = document.createElement("div");
+        track.className = "track";
+        const fill = document.createElement("div");
+        fill.className = "fill";
+        fill.style.width = `${count / max * 100}%`;
+        if (field === "status") {
+          const colors = { "已打开": "var(--blue)", "已解决": "var(--green)", "重新打开": "var(--red)", "bug验证": "var(--amber)" };
+          fill.style.background = colors[value] || (value === "未设置" ? "#a7afbd" : "var(--blue)");
+        } else if (field === "priority") {
+          const colors = { P0: "var(--red)", P1: "#e78c3d", P2: "var(--amber)", P4: "#8997b2" };
+          fill.style.background = colors[priorityCode(value)] || "var(--blue)";
+        } else if (field === "project") {
+          fill.style.background = projectColors[index % projectColors.length];
+        }
+        track.append(fill);
+        const number = document.createElement("span");
+        number.className = "number";
+        number.textContent = count;
+        choice.append(name, track, number);
+        choice.addEventListener("click", () => {
+          document.getElementById(`${field}Filter`).value = value;
+          render();
+          document.querySelector(".details").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        row.append(choice);
+        target.append(row);
+      });
+      document.getElementById(`${field}Total`).textContent = `（${label} ${items.length} 条）`;
+    }
+
+    function renderTrend(items) {
+      const chart = document.getElementById("trendChart");
+      chart.replaceChildren();
+      const dated = items.filter(bug => bug.date !== "未设置");
+      const end = new Date("2026-10-08T00:00:00Z");
+      const monday = date => {
+        const copy = new Date(date);
+        const day = (copy.getUTCDay() + 6) % 7;
+        copy.setUTCDate(copy.getUTCDate() - day);
+        copy.setUTCHours(0, 0, 0, 0);
+        return copy;
+      };
+      const lastWeek = monday(end);
+      const weeks = Array.from({ length: 8 }, (_, index) => {
+        const start = new Date(lastWeek);
+        start.setUTCDate(start.getUTCDate() - (7 - index) * 7);
+        const key = start.toISOString().slice(0, 10);
+        return { start, key, count: 0 };
+      });
+      dated.forEach(bug => {
+        const start = monday(new Date(`${bug.date}T00:00:00Z`)).toISOString().slice(0, 10);
+        const week = weeks.find(item => item.key === start);
+        if (week) week.count++;
+      });
+      const max = Math.max(1, ...weeks.map(week => week.count));
+      const labels = document.createElement("div");
+      labels.className = "chart-y-labels";
+      [max, Math.ceil(max / 2), 0].forEach(value => {
+        const label = document.createElement("span");
+        label.textContent = value;
+        labels.append(label);
+      });
+      const grid = document.createElement("div");
+      grid.className = "chart-grid";
+      for (let index = 0; index < 3; index++) {
+        const line = document.createElement("div");
+        line.className = "grid-line";
+        grid.append(line);
+      }
+      const bars = document.createElement("div");
+      bars.className = "chart-bars";
+      weeks.forEach(week => {
+        const column = document.createElement("div");
+        column.className = "week";
+        const space = document.createElement("div");
+        space.className = "bar-space";
+        const bar = document.createElement("div");
+        bar.className = `bar${week.count ? "" : " zero"}`;
+        bar.style.height = `${week.count ? Math.max(8, week.count / max * 100) : 2}%`;
+        bar.setAttribute("aria-label", `${week.key} 周，${week.count} 条`);
+        if (week.count) {
+          const value = document.createElement("span");
+          value.className = "bar-value";
+          value.textContent = week.count;
+          bar.append(value);
+        }
+        space.append(bar);
+        const label = document.createElement("span");
+        label.className = "week-label";
+        label.textContent = `${week.start.getUTCMonth() + 1}/${week.start.getUTCDate()}`;
+        column.append(space, label);
+        bars.append(column);
+      });
+      chart.append(labels, grid, bars);
+    }
+
+    function priorityTagClass(priority) {
+      const klass = ({ P0: "tag-p0", P1: "tag-p1", P2: "tag-p2", P4: "tag-p4" })[priorityCode(priority)] || "";
+      return `tag ${klass}`.trim();
+    }
+
+    function statusTagClass(status) {
+      const klass = ({
+        "已打开": "tag-open",
+        "已解决": "tag-resolved",
+        "重新打开": "tag-reopen",
+        "bug验证": "tag-verify",
+        "未设置": "tag-unknown"
+      })[status] || "tag-open";
+      return `tag ${klass}`;
+    }
+
+    function createIssueLink(bug, className, text, label) {
+      const link = document.createElement("a");
+      link.className = className;
+      link.href = `https://project.feishu.cn/i9lz5k/issue/detail/${encodeURIComponent(bug.id)}`;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = text;
+      link.title = label;
+      return link;
+    }
+
+    function renderBugRow(bug) {
+      const row = document.createElement("tr");
+      const titleCell = document.createElement("td");
+      titleCell.className = "title-cell";
+      const link = createIssueLink(bug, "bug-link", bug.title, `打开 ${bug.title} 的飞书 Bug 详情`);
+      const id = document.createElement("span");
+      id.className = "issue-id";
+      id.textContent = `ID ${bug.id}`;
+      titleCell.append(link, id);
+      row.append(titleCell);
+      const status = document.createElement("td");
+      const statusTag = createIssueLink(bug, statusTagClass(bug.status), bug.status, `打开此 Bug：状态 ${bug.status}`);
+      status.append(statusTag);
+      row.append(status);
+      const priority = document.createElement("td");
+      priority.append(createIssueLink(bug, priorityTagClass(bug.priority), bug.priority, `打开此 Bug：优先级 ${bug.priority}`));
+      row.append(priority);
+      [bug.project, bug.date].forEach(value => {
+        const cell = document.createElement("td");
+        cell.append(createIssueLink(bug, "field-link", value, `打开此 Bug：${value}`));
+        row.append(cell);
+      });
+      return row;
+    }
+
+    function renderDetails(items) {
+      const groupBy = document.getElementById("groupBy").value;
+      const grouped = new Map();
+      items.forEach(bug => {
+        if (!grouped.has(bug[groupBy])) grouped.set(bug[groupBy], []);
+        grouped.get(bug[groupBy]).push(bug);
+      });
+      groupsElement.replaceChildren();
+      const keys = [...grouped.keys()].sort((a, b) => {
+        if (groupBy === "priority") return priorityOrder.indexOf(priorityCode(a)) - priorityOrder.indexOf(priorityCode(b));
+        if (groupBy === "status") return sortedValues("status").indexOf(a) - sortedValues("status").indexOf(b);
+        return a === "未设置" ? 1 : b === "未设置" ? -1 : a.localeCompare(b, "zh-CN");
+      });
+      if (!items.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "没有符合条件的 Bug。";
+        groupsElement.append(empty);
+        return;
+      }
+      keys.forEach(key => {
+        const section = document.createElement("section");
+        section.className = "group";
+        const heading = document.createElement("div");
+        heading.className = "group-title";
+        const name = document.createElement("span");
+        name.textContent = `${fieldLabels[groupBy]}：${key}`;
+        const count = document.createElement("span");
+        count.textContent = `${grouped.get(key).length} 条`;
+        heading.append(name, count);
+        const wrap = document.createElement("div");
+        wrap.className = "table-wrap";
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const header = document.createElement("tr");
+        ["Bug 标题", "缺陷状态", "优先级", "所属项目", "问题时间"].forEach(text => {
+          const th = document.createElement("th");
+          th.textContent = text;
+          header.append(th);
+        });
+        thead.append(header);
+        const tbody = document.createElement("tbody");
+        grouped.get(key).forEach(bug => tbody.append(renderBugRow(bug)));
+        table.append(thead, tbody);
+        wrap.append(table);
+        section.append(heading, wrap);
+        groupsElement.append(section);
+      });
+    }
+
+    function render() {
+      const items = currentItems();
+      const statusCounts = new Map();
+      items.forEach(bug => statusCounts.set(bug.status, (statusCounts.get(bug.status) || 0) + 1));
+      const pills = document.getElementById("statusPills");
+      pills.replaceChildren();
+      const currentStatus = document.getElementById("statusFilter").value;
+      const pillValues = [["", "全部", items.length], ...sortedValues("status", items).map(status => [status, status, statusCounts.get(status)])];
+      pillValues.forEach(([value, label, count], index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `pill ${index === 0 ? "pill-all" : statusStyle[value] || "pill-unknown"}`;
+        button.setAttribute("aria-pressed", String((index === 0 && !currentStatus) || currentStatus === value));
+        button.textContent = `${label} ${count}`;
+        button.addEventListener("click", () => {
+          document.getElementById("statusFilter").value = value;
+          render();
+          document.querySelector(".details").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        pills.append(button);
+      });
+
+      const resolved = items.filter(bug => bug.status === "已解决" || bug.status === "已关闭").length;
+      const knownStatus = items.filter(bug => bug.status !== "未设置");
+      document.getElementById("totalCount").textContent = items.length;
+      document.getElementById("resolvedCount").textContent = resolved;
+      document.getElementById("attentionCount").textContent = knownStatus.length - resolved;
+      document.getElementById("p0p1Count").textContent = items.filter(bug => ["P0", "P1"].includes(priorityCode(bug.priority))).length;
+      document.getElementById("resultCount").textContent = `显示 ${items.length} / ${bugs.length} 条`;
+
+      renderTrend(items);
+      renderDistribution("statusChart", items, "status", "共");
+      renderDistribution("priorityChart", items, "priority", "共");
+      renderDistribution("projectChart", items, "project", "共");
+      renderDetails(items);
+    }
+
+    fillFilter("priorityFilter", "priority");
+    fillFilter("projectFilter", "project");
+    fillFilter("statusFilter", "status");
+    ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "search", "groupBy"]
+      .forEach(id => document.getElementById(id).addEventListener("input", render));
+    ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "groupBy"]
+      .forEach(id => document.getElementById(id).addEventListener("change", render));
+    document.getElementById("resetFilters").addEventListener("click", () => {
+      ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "search"].forEach(id => {
+        const element = document.getElementById(id);
+        element.value = id === "rangeFilter" ? "all" : "";
+      });
+      document.getElementById("groupBy").value = "priority";
+      render();
+    });
+    render();
+  </script>
+</body>
+</html>
