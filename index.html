@@ -130,7 +130,7 @@
       <div>
         <h1>飞书项目 · Bug 状态看板</h1>
         <div class="metadata">
-          空间 i9lz5k · issue · 共 17 条 · 数据快照 2026/10/08 ·
+          空间 i9lz5k · issue · 共 18 条 · 数据快照 2026/10/09 ·
           <a href="https://project.feishu.cn/i9lz5k/issue/homepage?lang=zh-CN" target="_blank" rel="noopener noreferrer">打开飞书原列表 ↗</a>
         </div>
       </div>
@@ -205,23 +205,150 @@
 
   <script>
     const bugs = [
-      { id: "7130800674", title: "xxx", status: "已打开", priority: "P4-无效任务（已知/无效）", project: "其它", date: "2026-10-08" },
-      { id: "7128705016", title: "采集过程中can/cam等异常。", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "数采背包", date: "2026-09-30" },
-      { id: "7128476637", title: "手套角度编码器有问题（特别是大拇指）", status: "已打开", priority: "P0 - 最高优先级 (致命/紧急)", project: "手&手套", date: "2026-09-29" },
-      { id: "7128153637", title: "keepLiNK KP-9000-6XHML-X 端口入口限速，≤400M 时精确，>400M 时 Enforcement 值饱和于 ~430M", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "未设置" },
-      { id: "7126744153", title: "RK_2002E 在 `reboot -f`（硬重启）后偶发不回启（ 2026年9月24日 19:39左右 ）：板子掉电/卡死后不再开机，导致远程链路彻底中断", status: "已打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "2026-09-28" },
-      { id: "7125660990", title: "RK_2002E 的adb出现连不上情况", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-24" },
-      { id: "7125518083", title: "UMI手套角度编码器读取以及可视化", status: "已解决", priority: "P2 - 中优先级 (一般)", project: "手&手套、数采背包", date: "未设置" },
-      { id: "7124887944", title: "？？", status: "bug验证", priority: "P0 - 最高优先级 (致命/紧急)", project: "其它", date: "2026-09-23" },
-      { id: "7122045167", title: "RK3588 xhci 主机控制器假死（HC died）→ USB 整树静默掉线（CANFD-hub 与 U 盘同时消失、控制器不响应枚举），纯物理重插无法恢复 的总线级故障；板子断电重启之后，错误现象消失", status: "重新打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "2026-09-21" },
-      { id: "7117641346", title: "RK3588 网口链路持续抖动会把 8MB 连续内存（CMA）池拖到干涸，触发内核 CMA 连续内存分配失败；建议增大 CMA 容量", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-17" },
-      { id: "7116689092", title: "[USB]USB 存储设备热拔插后设备命名漂移 + 僵尸只读挂载残留(偶发)", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-16" },
-      { id: "7116044530", title: "[NPU]NPU 推理进程正常退出后重新拉起时偶发 SIGSEGV（rc=139），三核模式约 8% 复现率（动态重启竞态）", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-15" },
-      { id: "7116020731", title: "[NPU]NPU 输入张量超尺寸 或者 输入张量数据类型（dtype）错误，被驱动静默接受（无报错）", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-14" },
-      { id: "7116017271", title: "[NPU]NPU 进程被 SIGKILL 异常退出后，新建/沿用进程随机段错误（竞态）", status: "已打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "未设置" },
-      { id: "7115265662", title: "[OTA]通过 eth1 网线连接 adb后，用 Poke OTA Host，无法成功连接", status: "已打开", priority: "P2 - 中优先级 (一般)", project: "手&手套", date: "2026-09-15" },
-      { id: "7114344757", title: "boot 0（19:53:29 起）起来后，NetworkManager 对 eth1 的 DHCP 一直拿不到 offer（19:55:04 起反复 ip-config -> failed），板子从此无 IP。另外 19:54:51 有一次 8852be WiFi 驱动内核 oops", status: "已打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "2026-09-14" },
-      { id: "7112870433", title: "PREEMPT_RT实时调度测试中，多锁嵌套 / 信号量同步延迟（锁争用补充），tc12_lock.sh，运行时，出现一次系统卡死崩溃。", status: "已打开", priority: "P1 - 高优先级 (重要)", project: "手&手套", date: "2026-09-11" }
+          {
+                "id": "7131321298",
+                "title": "整机主控重新上电后，上位机无法发现整机ROS2服务",
+                "status": "已打开",
+                "priority": "P1  - 高优先级 (重要)",
+                "project": "整机",
+                "date": "2026-10-09"
+          },
+          {
+                "id": "7130800674",
+                "title": "xxx",
+                "status": "已打开",
+                "priority": "P4-无效任务（已知/无效）",
+                "project": "其它",
+                "date": "2026-10-08"
+          },
+          {
+                "id": "7128705016",
+                "title": "采集过程中can/cam等异常。",
+                "status": "已打开",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "数采背包",
+                "date": "2026-09-30"
+          },
+          {
+                "id": "7128476637",
+                "title": "手套角度编码器有问题（特别是大拇指）",
+                "status": "已打开",
+                "priority": "P0 - 最高优先级 (致命/紧急)",
+                "project": "手&手套",
+                "date": "2026-09-29"
+          },
+          {
+                "id": "7128153637",
+                "title": "keepLiNK KP-9000-6XHML-X 端口入口限速，≤400M 时精确，>400M 时 Enforcement 值饱和于 ~430M",
+                "status": "已打开",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "手&手套",
+                "date": "2026-09-29"
+          },
+          {
+                "id": "7126744153",
+                "title": "RK_2002E 在 `reboot -f`（硬重启）后偶发不回启（ 2026年9月24日 19:39左右 ）：板子掉电/卡死后不再开机，导致远程链路彻底中断",
+                "status": "已打开",
+                "priority": "P1  - 高优先级 (重要)",
+                "project": "手&手套",
+                "date": "2026-09-28"
+          },
+          {
+                "id": "7125660990",
+                "title": "RK_2002E 的adb出现连不上情况",
+                "status": "已打开",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "手&手套",
+                "date": "2026-09-24"
+          },
+          {
+                "id": "7125518083",
+                "title": "UMI手套角度编码器读取以及可视化",
+                "status": "已解决",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "手&手套, 数采背包",
+                "date": "2026-09-24"
+          },
+          {
+                "id": "7124887944",
+                "title": "？？",
+                "status": "bug验证",
+                "priority": "P0 - 最高优先级 (致命/紧急)",
+                "project": "其它",
+                "date": "2026-09-23"
+          },
+          {
+                "id": "7122045167",
+                "title": "RK3588 xhci 主机控制器假死（HC died）→ USB 整树静默掉线（CANFD-hub 与 U 盘同时消失、控制器不响应枚举），纯物理重插无法恢复 的总线级故障；板子断电重启之后，错误现象消失",
+                "status": "重新打开",
+                "priority": "P1  - 高优先级 (重要)",
+                "project": "手&手套",
+                "date": "2026-09-21"
+          },
+          {
+                "id": "7117641346",
+                "title": "RK3588 网口链路持续抖动会把 8MB 连续内存（CMA）池拖到干涸，触发内核 CMA 连续内存分配失败；建议增大 CMA 容量",
+                "status": "已打开",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "手&手套",
+                "date": "2026-09-17"
+          },
+          {
+                "id": "7116689092",
+                "title": "[USB]USB 存储设备热拔插后设备命名漂移 + 僵尸只读挂载残留(偶发)",
+                "status": "已打开",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "手&手套",
+                "date": "2026-09-16"
+          },
+          {
+                "id": "7116044530",
+                "title": "[NPU]NPU 推理进程正常退出后重新拉起时偶发 SIGSEGV（rc=139），三核模式约 8% 复现率（动态重启竞态）",
+                "status": "已打开",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "手&手套",
+                "date": "2026-09-16"
+          },
+          {
+                "id": "7116020731",
+                "title": "[NPU]NPU 输入张量超尺寸 或者  输入张量数据类型（dtype）错误，被驱动静默接受（无报错）",
+                "status": "已打开",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "手&手套",
+                "date": "2026-09-16"
+          },
+          {
+                "id": "7116017271",
+                "title": "[NPU]NPU 进程被 SIGKILL 异常退出后，新建/沿用进程随机段错误（竞态）",
+                "status": "已打开",
+                "priority": "P1  - 高优先级 (重要)",
+                "project": "手&手套",
+                "date": "2026-09-16"
+          },
+          {
+                "id": "7115265662",
+                "title": "[OTA]通过 eth1 网线连接 adb后，用 Poke OTA Host，无法成功连接",
+                "status": "已打开",
+                "priority": "P2 - 中优先级 (一般)",
+                "project": "手&手套",
+                "date": "2026-09-15"
+          },
+          {
+                "id": "7114344757",
+                "title": "boot 0（19:53:29 起）起来后，NetworkManager 对 eth1 的 DHCP 一直拿不到 offer（19:55:04 起反复 ip-config -> failed），板子从此无 IP。另外 19:54:51 有一次 8852be WiFi 驱动内核 oops",
+                "status": "已打开",
+                "priority": "P1  - 高优先级 (重要)",
+                "project": "手&手套",
+                "date": "2026-09-14"
+          },
+          {
+                "id": "7112870433",
+                "title": "PREEMPT_RT实时调度测试中，多锁嵌套 / 信号量同步延迟（锁争用补充），tc12_lock.sh，运行时，出现一次系统卡死崩溃。",
+                "status": "已打开",
+                "priority": "P1  - 高优先级 (重要)",
+                "project": "手&手套",
+                "date": "2026-09-11"
+          }
     ];
 
     const demoBugs = bugs.slice();
