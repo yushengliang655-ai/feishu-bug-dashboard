@@ -47,13 +47,18 @@ jobs:
           }
       - name: Close sync request
         if: success() && github.event_name == 'issues'
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPOSITORY: ${{ github.repository }}
         shell: powershell
         run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           $headers = @{ Authorization = "Bearer $env:GITHUB_TOKEN"; Accept = "application/vnd.github+json" }
           $url = "https://api.github.com/repos/$env:REPOSITORY/issues/$env:ISSUE_NUMBER"
-          Invoke-RestMethod -Method Patch -Uri $url -Headers $headers -Body (@{ state = "closed" } | ConvertTo-Json) -ContentType "application/json" | Out-Null
-          Invoke-RestMethod -Method Post -Uri "$url/comments" -Headers $headers -Body (@{ body = "看板同步已完成，请刷新页面查看。" } | ConvertTo-Json) -ContentType "application/json" | Out-Null
+          $body = @{ state = "closed" } | ConvertTo-Json
+          Invoke-RestMethod -Method Patch -Uri $url -Headers $headers -Body $body -ContentType "application/json; charset=utf-8" | Out-Null
+          $comment = @{ body = "看板同步已完成，请刷新页面查看。" } | ConvertTo-Json
+          $bytes = [System.Text.Encoding]::UTF8.GetBytes($comment)
+          Invoke-RestMethod -Method Post -Uri "$url/comments" -Headers $headers -Body $bytes -ContentType "application/json; charset=utf-8" | Out-Null
