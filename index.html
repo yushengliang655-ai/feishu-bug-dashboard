@@ -750,7 +750,9 @@
 
     function fillFilter(id, field) {
       const select = document.getElementById(id);
-      sortedValues(field).forEach(value => {
+      const values = sortedValues(field);
+      if (field === "status" && !values.includes("已关闭")) values.push("已关闭");
+      values.forEach(value => {
         const option = document.createElement("option");
         option.value = value;
         option.textContent = value;
