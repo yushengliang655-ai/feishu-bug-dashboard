@@ -112,7 +112,7 @@ function parseRecord(record) {
   };
 }
 
-const mql = `SELECT \`work_item_id\`, \`name\`, \`work_item_status\`, \`priority\`, \`start_time\`, \`archiving_date\`, \`field_36f47a\` FROM \`${projectKey}\`.\`${workItemType}\` WHERE \`archiving_date\` IS NULL`;
+const mql = `SELECT \`work_item_id\`, \`name\`, \`work_item_status\`, \`priority\`, \`start_time\`, \`archiving_date\`, \`field_36f47a\` FROM \`${projectKey}\`.\`${workItemType}\``;
 const firstPage = runMeegle(["workitem", "query", "--project-key", projectKey, "--mql", mql, "--format", "json"]);
 const list = firstPage.list;
 if (!Array.isArray(list) || !list.length || !Array.isArray(list[0].group_infos)) {
