@@ -41,6 +41,7 @@
     .pill-all { background: #eef1f6; color: #586274; }
     .pill-open { background: #eaf0ff; color: #3567db; }
     .pill-resolved { background: #e8f7ed; color: #34945a; }
+    .pill-closed { background: #f1f2f5; color: #64748b; }
     .pill-reopen { background: #fdeceb; color: #ce524d; }
     .pill-verify { background: #fff4df; color: #bb811a; }
     .pill-unknown { background: #f1f2f5; color: #727b8a; }
@@ -97,6 +98,7 @@
     .tag-p4 { background: #edf1f8; color: #64728b; }
     .tag-open { background: #eaf0ff; color: #3567db; }
     .tag-resolved { background: #e8f7ed; color: #34945a; }
+    .tag-closed { background: #f1f2f5; color: #64748b; }
     .tag-reopen { background: #fdeceb; color: #ce524d; }
     .tag-verify { background: #fff4df; color: #bb811a; }
     .tag-unknown { background: #f1f2f5; color: #727b8a; }
@@ -446,7 +448,7 @@
     let lastRefreshAt = null;
 
     const priorityOrder = ["P0", "P1", "P2", "P3", "P4", "未设置"];
-    const statusStyle = { "已打开": "pill-open", "已解决": "pill-resolved", "重新打开": "pill-reopen", "bug验证": "pill-verify", "未设置": "pill-unknown" };
+    const statusStyle = { "已打开": "pill-open", "已解决": "pill-resolved", "已关闭": "pill-closed", "重新打开": "pill-reopen", "bug验证": "pill-verify", "未设置": "pill-unknown" };
     const projectColors = ["var(--blue)", "var(--green)", "#e6a83e", "#8b5cf6"];
     const fieldLabels = { priority: "优先级", project: "项目", status: "状态" };
     const groupsElement = document.getElementById("groups");
@@ -468,7 +470,8 @@
         "opened": "已打开",
         "已打开": "已打开",
         "open_bug": "已打开",
-        "closed": "已解决",
+        "closed": "已关闭",
+        "已关闭": "已关闭",
         "已解决": "已解决",
         "reopened": "重新打开",
         "重新打开": "重新打开",
@@ -645,7 +648,7 @@
         }
         return {
           title: text.slice(0, 120) || `Bug ${issueId}`,
-          status: normalizeStatus(text.match(/已解决|已打开|重新打开|待验证|bug验证|处理中|验证中/i)?.[0] || ""),
+          status: normalizeStatus(text.match(/已关闭|已解决|已打开|重新打开|待验证|bug验证|处理中|验证中/i)?.[0] || ""),
           priority: normalizePriority(text.match(/P0|P1|P2|P3|P4/i)?.[0] || ""),
           project: normalizeProject(text.match(/项目[:：].+?(?:\n|\s|$)/)?.[0].replace(/项目[:：]/, "") || "其它"),
           date: normalizeDate(text.match(/\d{4}[/-]\d{1,2}[/-]\d{1,2}/)?.[0] || "")
@@ -795,7 +798,7 @@
         fill.className = "fill";
         fill.style.width = `${count / max * 100}%`;
         if (field === "status") {
-          const colors = { "已打开": "var(--blue)", "已解决": "var(--green)", "重新打开": "var(--red)", "bug验证": "var(--amber)" };
+          const colors = { "已打开": "var(--blue)", "已解决": "var(--green)", "已关闭": "#64748b", "重新打开": "var(--red)", "bug验证": "var(--amber)" };
           fill.style.background = colors[value] || (value === "未设置" ? "#a7afbd" : "var(--blue)");
         } else if (field === "priority") {
           const colors = { P0: "var(--red)", P1: "#e78c3d", P2: "var(--amber)", P4: "#8997b2" };
@@ -894,6 +897,7 @@
       const klass = ({
         "已打开": "tag-open",
         "已解决": "tag-resolved",
+        "已关闭": "tag-closed",
         "重新打开": "tag-reopen",
         "bug验证": "tag-verify",
         "未设置": "tag-unknown"
