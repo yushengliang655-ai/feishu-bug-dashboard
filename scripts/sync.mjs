@@ -26,7 +26,9 @@ function runMeegle(args) {
 
   const output = execFileSync(executable, commandArgs, {
     encoding: "utf8",
-    stdio: ["ignore", "pipe", "inherit"]
+    stdio: ["ignore", "pipe", "inherit"],
+    timeout: 60_000,
+    maxBuffer: 16 * 1024 * 1024
   });
   try {
     const result = JSON.parse(output);
