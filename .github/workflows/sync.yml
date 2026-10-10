@@ -13,12 +13,13 @@ permissions:
 
 concurrency:
   group: sync-feishu-bug-dashboard
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   sync:
     if: github.event_name != 'issues' || (github.event.issue.title == '[sync-dashboard] 同步看板' && github.event.issue.state == 'open')
     runs-on: [self-hosted, windows, x64]
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
