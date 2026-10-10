@@ -163,7 +163,7 @@
 
     <section class="stats" aria-label="统计摘要">
       <article class="stat panel" style="--stat-color:var(--blue)"><div class="stat-value" id="totalCount">0</div><div class="stat-label">当前范围 Bug</div></article>
-      <article class="stat panel" style="--stat-color:var(--green)"><div class="stat-value" id="resolvedCount">0</div><div class="stat-label">已解决</div></article>
+      <article class="stat panel" style="--stat-color:#64748b"><div class="stat-value" id="resolvedCount">0</div><div class="stat-label">已关闭</div></article>
       <article class="stat panel" style="--stat-color:var(--amber)"><div class="stat-value" id="attentionCount">0</div><div class="stat-label">有状态但未解决</div></article>
       <article class="stat panel" style="--stat-color:#dc2626"><div class="stat-value" id="p0p1Count">0</div><div class="stat-label">P0 / P1 优先级</div></article>
     </section>
@@ -1016,9 +1016,10 @@
       });
 
       const resolved = items.filter(bug => bug.status === "已解决" || bug.status === "已关闭").length;
+      const closed = items.filter(bug => bug.status === "已关闭").length;
       const knownStatus = items.filter(bug => bug.status !== "未设置");
       document.getElementById("totalCount").textContent = items.length;
-      document.getElementById("resolvedCount").textContent = resolved;
+      document.getElementById("resolvedCount").textContent = closed;
       document.getElementById("attentionCount").textContent = knownStatus.length - resolved;
       document.getElementById("p0p1Count").textContent = items.filter(bug => ["P0", "P1"].includes(priorityCode(bug.priority))).length;
       document.getElementById("resultCount").textContent = `显示 ${items.length} / ${bugs.length} 条`;
