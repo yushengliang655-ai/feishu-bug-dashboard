@@ -157,6 +157,8 @@
       <select id="projectFilter" aria-label="按项目筛选"><option value="">全部</option></select>
       <span class="filter-label">状态</span>
       <select id="statusFilter" aria-label="按状态筛选"><option value="">全部</option></select>
+      <span class="filter-label">Bug类型</span>
+      <select id="bugTypeFilter" aria-label="按Bug类型筛选"><option value="">全部</option></select>
       <input class="search" id="search" type="search" placeholder="标题 / ID 搜索" aria-label="标题或编号搜索">
       <div class="status-pills" id="statusPills" aria-label="状态快捷筛选"></div>
     </section>
@@ -189,6 +191,11 @@
       <div id="projectChart"></div>
     </section>
 
+    <section class="distribution panel" style="margin-bottom:14px">
+      <h2 class="section-title">Bug类型分布 <span class="filter-label" id="bugTypeTotal"></span></h2>
+      <div id="bugTypeChart"></div>
+    </section>
+
     <section class="details panel">
       <div class="details-heading">
         <h2 class="section-title">Bug 明细</h2>
@@ -198,6 +205,7 @@
             <option value="priority">按优先级</option>
             <option value="project">按项目</option>
             <option value="status">按状态</option>
+            <option value="bugType">按Bug类型</option>
           </select>
         </label>
       </div>
@@ -215,6 +223,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-10-10"
+                "bugType": "3588",
           },
           {
                 "id": "7131821688",
@@ -223,6 +232,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131897094",
@@ -231,6 +241,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131904558",
@@ -239,6 +250,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131774237",
@@ -247,6 +259,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131628404",
@@ -255,6 +268,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131685043",
@@ -263,6 +277,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131919586",
@@ -271,6 +286,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131890083",
@@ -279,6 +295,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131738840",
@@ -287,6 +304,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131845051",
@@ -295,6 +313,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131849104",
@@ -303,6 +322,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131626450",
@@ -311,6 +331,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "数采背包",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7131321298",
@@ -319,6 +340,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "整机",
                 "date": "2026-10-09"
+                "bugType": "暂无",
           },
           {
                 "id": "7128705016",
@@ -327,6 +349,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "数采背包",
                 "date": "2026-09-30"
+                "bugType": "暂无",
           },
           {
                 "id": "7128476637",
@@ -335,6 +358,7 @@
                 "priority": "P0 - 最高优先级 (致命/紧急)",
                 "project": "手&手套",
                 "date": "2026-09-29"
+                "bugType": "暂无",
           },
           {
                 "id": "7128153637",
@@ -343,6 +367,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-09-29"
+                "bugType": "暂无",
           },
           {
                 "id": "7126744153",
@@ -351,6 +376,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "手&手套",
                 "date": "2026-09-28"
+                "bugType": "暂无",
           },
           {
                 "id": "7125660990",
@@ -359,6 +385,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-09-24"
+                "bugType": "暂无",
           },
           {
                 "id": "7125518083",
@@ -367,6 +394,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套, 数采背包",
                 "date": "2026-09-24"
+                "bugType": "暂无",
           },
           {
                 "id": "7122045167",
@@ -375,6 +403,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "手&手套",
                 "date": "2026-09-21"
+                "bugType": "3588",
           },
           {
                 "id": "7117641346",
@@ -383,6 +412,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-09-17"
+                "bugType": "3588",
           },
           {
                 "id": "7116689092",
@@ -391,6 +421,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-09-16"
+                "bugType": "暂无",
           },
           {
                 "id": "7116044530",
@@ -399,6 +430,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-09-16"
+                "bugType": "暂无",
           },
           {
                 "id": "7116020731",
@@ -407,6 +439,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-09-16"
+                "bugType": "暂无",
           },
           {
                 "id": "7116017271",
@@ -415,6 +448,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "手&手套",
                 "date": "2026-09-16"
+                "bugType": "暂无",
           },
           {
                 "id": "7115265662",
@@ -423,6 +457,7 @@
                 "priority": "P2 - 中优先级 (一般)",
                 "project": "手&手套",
                 "date": "2026-09-15"
+                "bugType": "暂无",
           },
           {
                 "id": "7114344757",
@@ -431,6 +466,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "手&手套",
                 "date": "2026-09-14"
+                "bugType": "暂无",
           },
           {
                 "id": "7112870433",
@@ -439,6 +475,7 @@
                 "priority": "P1  - 高优先级 (重要)",
                 "project": "手&手套",
                 "date": "2026-09-11"
+                "bugType": "暂无",
           }
     ];
 
@@ -450,7 +487,7 @@
     const priorityOrder = ["P0", "P1", "P2", "P3", "P4", "未设置"];
     const statusStyle = { "已打开": "pill-open", "已解决": "pill-resolved", "已关闭": "pill-closed", "重新打开": "pill-reopen", "bug验证": "pill-verify", "未设置": "pill-unknown" };
     const projectColors = ["var(--blue)", "var(--green)", "#e6a83e", "#8b5cf6"];
-    const fieldLabels = { priority: "优先级", project: "项目", status: "状态" };
+    const fieldLabels = { priority: "优先级", project: "项目", status: "状态", bugType: "Bug类型" };
     const groupsElement = document.getElementById("groups");
     const PROJECT_URL = "https://project.feishu.cn/i9lz5k/issue/homepage?lang=zh-CN";
     const FEISHU_DETAIL_PATH = /\/issue\/detail\/([^/?#]+)/;
@@ -764,6 +801,7 @@
       const priority = document.getElementById("priorityFilter").value;
       const project = document.getElementById("projectFilter").value;
       const status = document.getElementById("statusFilter").value;
+      const bugType = document.getElementById("bugTypeFilter").value;
       const search = document.getElementById("search").value.trim().toLocaleLowerCase();
       const days = document.getElementById("rangeFilter").value;
       const latestDate = bugs.map(bug => bug.date).filter(date => date !== "未设置").sort().at(-1);
@@ -773,6 +811,7 @@
         return (!priority || bug.priority === priority) &&
           (!project || bug.project === project) &&
           (!status || bug.status === status) &&
+          (!bugType || bug.bugType === bugType) &&
           (!search || `${bug.title} ${bug.id}`.toLocaleLowerCase().includes(search)) &&
           (!cutoff || Number.isNaN(dateTime) || dateTime >= cutoff);
       });
@@ -807,6 +846,9 @@
           fill.style.background = colors[priorityCode(value)] || "var(--blue)";
         } else if (field === "project") {
           fill.style.background = projectColors[index % projectColors.length];
+        } else if (field === "bugType") {
+          const colors = { "3588": "var(--red)", "BSP": "var(--blue)", "MCU": "var(--green)", "EE": "var(--amber)", "软件": "var(--purple)", "结构": "#e78c3d", "硬件": "#64748b", "暂无": "#a7afbd" };
+          fill.style.background = colors[value] || "var(--blue)";
         }
         track.append(fill);
         const number = document.createElement("span");
@@ -978,7 +1020,7 @@
         const table = document.createElement("table");
         const thead = document.createElement("thead");
         const header = document.createElement("tr");
-        ["Bug 标题", "缺陷状态", "优先级", "所属项目", "问题时间"].forEach(text => {
+        ["Bug 标题", "缺陷状态", "优先级", "所属项目", "Bug类型", "问题时间"].forEach(text => {
           const th = document.createElement("th");
           th.textContent = text;
           header.append(th);
@@ -1028,18 +1070,20 @@
       renderDistribution("statusChart", items, "status", "共");
       renderDistribution("priorityChart", items, "priority", "共");
       renderDistribution("projectChart", items, "project", "共");
+      renderDistribution("bugTypeChart", items, "bugType", "共");
       renderDetails(items);
     }
 
     fillFilter("priorityFilter", "priority");
     fillFilter("projectFilter", "project");
     fillFilter("statusFilter", "status");
-    ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "search", "groupBy"]
+    fillFilter("bugTypeFilter", "bugType");
+    ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "bugTypeFilter", "search", "groupBy"]
       .forEach(id => document.getElementById(id).addEventListener("input", render));
-    ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "groupBy"]
+    ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "bugTypeFilter", "groupBy"]
       .forEach(id => document.getElementById(id).addEventListener("change", render));
     document.getElementById("resetFilters").addEventListener("click", () => {
-      ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "search"].forEach(id => {
+      ["rangeFilter", "priorityFilter", "projectFilter", "statusFilter", "bugTypeFilter", "search"].forEach(id => {
         const element = document.getElementById(id);
         element.value = id === "rangeFilter" ? "all" : "";
       });
